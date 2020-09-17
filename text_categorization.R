@@ -67,16 +67,25 @@ knitr::kable(head(Amt_ByConfidential, n = 10), digits = 0, format.args = list(bi
 
 # categorization of text
 
-dic <- dictionary(list(other_medical = c("ventilator","surgical","consumable", "medical", "supply", "supplies","refrigerated","trailer","hospital","beds","laundry","bleach","disinfectant","sanitizing","wipe"), 
-                       testing = c("testing", "test", "site", "kit", "transport", "lab", "laboratory", "reagent"), 
-                       ppe = c("ppe", "face", "mask", "nitrile", "glove", "n95", "kn95", "respirator", "infrared", "thermometer", "shield"), 
-                       travel = c("travel", "attend", "meeting", "mileage", "lodging", "specs", "specifications", "invest", "under","expectations","expected","expecting","expect"),
-                       food = c("catering", "breakfast", "lunch", "dinner", "food", "meal"),
-                       provider = c("provider", "breakfast","clinic")
-                       ))
+cat_words = read.csv("category_words.csv", strip.white = TRUE, na.strings=c("","NA"))
+cat_words_list <- lapply((as.list(cat_words)), function(x) x[!is.na(x)])
+
+dic <- dictionary(cat_words_list)
+
 
 TEXT_dfm <- dfm(spdg$TEXT, tolower = TRUE, remove = stopwords("english"))
 
 res <- dfm_lookup(TEXT_dfm, dic, valuetype = "glob", nomatch = "UNMATCHED")
 
 spdg_res <- cbind(convert(res, to = "data.frame"),spdg) 
+
+spdg_res$TokenTotal <- ntoken(res)
+
+spdg_res$MatchStatus <- FALSE
+spdg_res$MatchStatus[spdg_res$TokenTotal > spdg_res$UNMATCHED] <- TRUE
+
+#match rate
+table(spdg_res$MatchStatus)
+
+sum(spdg_res$Warrant_Amt_Numeric[spdg_res$travel > 0])
+sum(spdg_res$Warrant_Amt_Numeric[spdg_res$ppe > 0])
