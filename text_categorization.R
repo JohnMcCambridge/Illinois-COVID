@@ -1,13 +1,13 @@
 library("tidyverse")
 library("quanteda")
 
-setwd("C:/Users/John/Dropbox/GitHub/Illinois-COVID")
+#setwd("C:/Users/John/Dropbox/GitHub/JohnMcCambridge/Illinois-COVID")
+cat(sprintf("This script expects your working directory to be the base directory of the /Illinois-COVID/ github repo structure, i.e., /Illinois-COVID\nCurrent working directory: %s\n", getwd()))
 spdg <- read_tsv("IL-covid spdg 0820 TAB DELIM.txt", col_types = cols(.default = "c"))
 
 
 # run some initial analysis based on Agency Name, Fund Clean, Vendor Name.
 # also note that some TEXT values are 'Agency marked as confidential', pull those out
-
 
 # variable creation
 
@@ -87,5 +87,6 @@ spdg_res$MatchStatus[spdg_res$TokenTotal > spdg_res$UNMATCHED] <- TRUE
 #match rate
 table(spdg_res$MatchStatus)
 
+# sample insights of amounts spent by categorization
 sum(spdg_res$Warrant_Amt_Numeric[spdg_res$travel > 0])
 sum(spdg_res$Warrant_Amt_Numeric[spdg_res$ppe > 0])
